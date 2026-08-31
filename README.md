@@ -8,12 +8,14 @@ Terraform module to deploy a key vault with defaults, and optionaly some custome
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.7 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 5 |
+| <a name="requirement_time"></a> [time](#requirement\_time) | >= 0.9 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 5.3.0 |
+| <a name="provider_time"></a> [time](#provider\_time) | 0.14.1 |
 
 ## Modules
 
@@ -29,6 +31,7 @@ No modules.
 | [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
 | [azurerm_private_endpoint.this_unmanaged_dns](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
 | [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [time_sleep.role_propagation](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
 | [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
 
 ## Inputs
@@ -47,8 +50,10 @@ No modules.
 | <a name="input_ip_rules"></a> [ip\_rules](#input\_ip\_rules) | List of IP addresses allowed to access the Key Vault. | `list(string)` | `[]` | no |
 | <a name="input_key_vault_administrators"></a> [key\_vault\_administrators](#input\_key\_vault\_administrators) | Set of Key vault Administrators | <pre>map(object({<br/>    principal_id                     = string<br/>    skip_service_principal_aad_check = optional(bool, false)<br/>    principal_type                   = optional(string)<br/>  }))</pre> | `{}` | no |
 | <a name="input_key_vault_certificate_users"></a> [key\_vault\_certificate\_users](#input\_key\_vault\_certificate\_users) | Map of Key Vault Certificate Users | <pre>map(object({<br/>    principal_id                     = string<br/>    skip_service_principal_aad_check = optional(bool, false)<br/>    principal_type                   = optional(string)<br/>  }))</pre> | `{}` | no |
+| <a name="input_key_vault_crypto_officers"></a> [key\_vault\_crypto\_officers](#input\_key\_vault\_crypto\_officers) | Map of Key Vault Crypto Officers. Required to CREATE keys in the vault -- Key Vault Crypto User only permits using existing ones. | <pre>map(object({<br/>    principal_id                     = string<br/>    skip_service_principal_aad_check = optional(bool, false)<br/>    principal_type                   = optional(string)<br/>  }))</pre> | `{}` | no |
 | <a name="input_key_vault_crypto_users"></a> [key\_vault\_crypto\_users](#input\_key\_vault\_crypto\_users) | Map of Key Vault Crypto Users | <pre>map(object({<br/>    principal_id                     = string<br/>    skip_service_principal_aad_check = optional(bool, false)<br/>    principal_type                   = optional(string)<br/>  }))</pre> | `{}` | no |
 | <a name="input_key_vault_encryption_users"></a> [key\_vault\_encryption\_users](#input\_key\_vault\_encryption\_users) | Map of Key Vault Encryption Users | <pre>map(object({<br/>    principal_id                     = string<br/>    skip_service_principal_aad_check = optional(bool, false)<br/>    principal_type                   = optional(string)<br/>  }))</pre> | `{}` | no |
+| <a name="input_key_vault_readers"></a> [key\_vault\_readers](#input\_key\_vault\_readers) | Map of Key Vault Readers. Read metadata of vault objects without access to their values. | <pre>map(object({<br/>    principal_id                     = string<br/>    skip_service_principal_aad_check = optional(bool, false)<br/>    principal_type                   = optional(string)<br/>  }))</pre> | `{}` | no |
 | <a name="input_key_vault_secret_users"></a> [key\_vault\_secret\_users](#input\_key\_vault\_secret\_users) | Map of Key Vault Secret Users | <pre>map(object({<br/>    principal_id                     = string<br/>    skip_service_principal_aad_check = optional(bool, false)<br/>    principal_type                   = optional(string, null)<br/>  }))</pre> | `{}` | no |
 | <a name="input_keys"></a> [keys](#input\_keys) | This map describes the configuration for Azure Key Vault keys.<br/><br/>- `key_vault_id` - (Required) The ID of the Key Vault.<br/>- `key_type` - (Required) The type of the key.<br/>- `key_size` - (Required) The size of the key.<br/>- `key_opts` - (Required) The key operations that are permitted.<br/><br/>Example Inputs:<pre>hcl<br/>  key_vault_key = {<br/>    key_rsa = {<br/>      type = "RSA"<br/>      size = 4096<br/>      opts = ["encrypt", "decrypt", "sign", "verify", "wrapKey", "unwrapKey"]<br/>    }<br/>    key_ec = {<br/>      type = "EC"<br/>      curve = "P-256"<br/>      opts = ["sign", "verify"]<br/>    }<br/>  }</pre> | <pre>map(object({<br/>    name            = optional(string)<br/>    type            = optional(string)<br/>    curve           = optional(string)<br/>    size            = optional(number)<br/>    opts            = optional(list(string), [])<br/>    expiration_date = optional(string)<br/>    not_before_date = optional(string)<br/>    rotation_policy = optional(object({<br/>      automatic = optional(object({<br/>        time_after_creation = optional(string)<br/>        time_before_expiry  = optional(string)<br/>      }))<br/>      expire_after         = optional(string)<br/>      notify_before_expiry = optional(string)<br/>    }))<br/>    tags = optional(map(string), {})<br/>  }))</pre> | `{}` | no |
 | <a name="input_location"></a> [location](#input\_location) | The location of the Key Vault. If not specified, the location of the calling module is used. | `string` | `null` | no |
@@ -57,6 +62,7 @@ No modules.
 | <a name="input_private_endpoints_manage_dns_zone_group"></a> [private\_endpoints\_manage\_dns\_zone\_group](#input\_private\_endpoints\_manage\_dns\_zone\_group) | Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy. | `bool` | `true` | no |
 | <a name="input_public_network_access_enabled"></a> [public\_network\_access\_enabled](#input\_public\_network\_access\_enabled) | Specifies whether public network access is allowed. | `bool` | `false` | no |
 | <a name="input_purge_protection"></a> [purge\_protection](#input\_purge\_protection) | Specifies whether purge protection is enabled for this Key Vault. | `bool` | `true` | no |
+| <a name="input_role_assignment_propagation_delay"></a> [role\_assignment\_propagation\_delay](#input\_role\_assignment\_propagation\_delay) | How long to wait after granting the data-plane role assignments before creating keys. Azure role assignments are eventually consistent, so a key created immediately after the grant can fail with a 403. Set to "0s" to disable the wait. | `string` | `"30s"` | no |
 | <a name="input_sku"></a> [sku](#input\_sku) | The SKU name of the Key Vault. Can be 'standard' or 'premium'. | `string` | `"standard"` | no |
 | <a name="input_soft_delete_retention_days"></a> [soft\_delete\_retention\_days](#input\_soft\_delete\_retention\_days) | Number of days to retain soft deleted items. | `number` | `30` | no |
 | <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | List of subnet IDs allowed to access the Key Vault. | `list(string)` | `[]` | no |
