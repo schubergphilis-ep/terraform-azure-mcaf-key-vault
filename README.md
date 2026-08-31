@@ -8,12 +8,14 @@ Terraform module to deploy a key vault with defaults, and optionaly some custome
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.7 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 5 |
+| <a name="requirement_time"></a> [time](#requirement\_time) | >= 0.9 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 5.3.0 |
+| <a name="provider_time"></a> [time](#provider\_time) | 0.14.1 |
 
 ## Modules
 
@@ -29,6 +31,7 @@ No modules.
 | [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
 | [azurerm_private_endpoint.this_unmanaged_dns](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
 | [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [time_sleep.role_propagation](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
 | [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
 
 ## Inputs
@@ -57,6 +60,7 @@ No modules.
 | <a name="input_private_endpoints_manage_dns_zone_group"></a> [private\_endpoints\_manage\_dns\_zone\_group](#input\_private\_endpoints\_manage\_dns\_zone\_group) | Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy. | `bool` | `true` | no |
 | <a name="input_public_network_access_enabled"></a> [public\_network\_access\_enabled](#input\_public\_network\_access\_enabled) | Specifies whether public network access is allowed. | `bool` | `false` | no |
 | <a name="input_purge_protection"></a> [purge\_protection](#input\_purge\_protection) | Specifies whether purge protection is enabled for this Key Vault. | `bool` | `true` | no |
+| <a name="input_role_assignment_propagation_delay"></a> [role\_assignment\_propagation\_delay](#input\_role\_assignment\_propagation\_delay) | How long to wait after granting the data-plane role assignments before creating keys. Azure role assignments are eventually consistent, so a key created immediately after the grant can fail with a 403. Set to "0s" to disable the wait. | `string` | `"30s"` | no |
 | <a name="input_sku"></a> [sku](#input\_sku) | The SKU name of the Key Vault. Can be 'standard' or 'premium'. | `string` | `"standard"` | no |
 | <a name="input_soft_delete_retention_days"></a> [soft\_delete\_retention\_days](#input\_soft\_delete\_retention\_days) | Number of days to retain soft deleted items. | `number` | `30` | no |
 | <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | List of subnet IDs allowed to access the Key Vault. | `list(string)` | `[]` | no |
