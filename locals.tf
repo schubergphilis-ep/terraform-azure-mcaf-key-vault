@@ -24,13 +24,23 @@ locals {
     role_definition_name = "Key Vault Secrets User"
   }) }
 
+  key_vault_crypto_officers_assignments = { for k, v in var.key_vault_crypto_officers : "${k}_crypto_officers" => merge(v, {
+    role_definition_name = "Key Vault Crypto Officer"
+  }) }
+
+  key_vault_readers_assignments = { for k, v in var.key_vault_readers : "${k}_readers" => merge(v, {
+    role_definition_name = "Key Vault Reader"
+  }) }
+
   key_vault_certificate_users_assignments = { for k, v in var.key_vault_certificate_users : "${k}_cert_users" => merge(v, {
     role_definition_name = "Key Vault Certificate User"
   }) }
 
   role_assignments = merge(local.key_vault_administrators_assignments,
     local.key_vault_certificate_users_assignments,
+    local.key_vault_crypto_officers_assignments,
     local.key_vault_crypto_users_assignments,
+    local.key_vault_readers_assignments,
     local.key_vault_secret_users_assignments,
   local.key_vault_encryption_users)
 
