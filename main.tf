@@ -36,6 +36,18 @@ resource "azurerm_role_assignment" "this" {
   principal_type                   = each.value.principal_type
 }
 
+# Azure role assignments are eventually consistent. A key is created over the vault's
+# DATA plane, so the caller needs Key Vault Crypto Officer to have actually propagated --
+# depends_on alone only orders the API calls, it does not wait for the grant to take
+# effect. Without this the first apply fails with a bare 403 that says nothing about
+# propagation, and a second apply succeeds.
+resource "time_sleep" "role_propagation" {
+  count = length(local.role_assignments) > 0 && var.role_assignment_propagation_delay != "0s" ? 1 : 0
+
+  create_duration = var.role_assignment_propagation_delay
+  depends_on      = [azurerm_role_assignment.this]
+}
+
 resource "azurerm_key_vault_key" "customer_managed_key_rsa" {
   count = var.customer_managed_key != null ? 1 : 0
 
@@ -60,7 +72,8 @@ resource "azurerm_key_vault_key" "customer_managed_key_rsa" {
   }
 
   depends_on = [
-    azurerm_role_assignment.this
+    azurerm_role_assignment.this,
+    time_sleep.role_propagation
   ]
 }
 
@@ -96,6 +109,7 @@ resource "azurerm_key_vault_key" "this" {
   each.value.tags)
 
   depends_on = [
-    azurerm_role_assignment.this
+    azurerm_role_assignment.this,
+    time_sleep.role_propagation
   ]
 }
