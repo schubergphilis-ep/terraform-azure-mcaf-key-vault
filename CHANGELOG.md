@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.2](https://github.com/schubergphilis-ep/terraform-azure-mcaf-key-vault/compare/v1.1.1...v1.1.2) (2026-09-08)
+
+
+### 🐛 Fixes
+
+* rename enable_rbac_authorization for azurerm v5 ([#16](https://github.com/schubergphilis-ep/terraform-azure-mcaf-key-vault/issues/16)) ([82041fc](https://github.com/schubergphilis-ep/terraform-azure-mcaf-key-vault/commit/82041fc611d415315888328d08c1e4174abafb2c))
+
 ## [1.1.0](https://github.com/schubergphilis-ep/terraform-azure-mcaf-key-vault/compare/v1.1.1...v1.1.0) (2025-07-28)
 
 ## [1.1.1](https://github.com/schubergphilis-ep/terraform-azure-mcaf-key-vault/compare/v1.0.2...v1.1.1) (2025-07-28)
@@ -99,4 +106,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🚀 Features
 
 * first release ([#1](https://github.com/schubergphilis/terraform-azure-mcaf-key-vault/pull/1)) ([fb49df9](https://github.com/schubergphilis-ep/terraform-azure-mcaf-key-vault/commit/fb49df90be075e1192eed3422cd02624ebfe9ce8))
-
