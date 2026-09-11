@@ -1,16 +1,8 @@
 locals {
 
-  key_vault_administrators_assignments = merge({ for k, v in var.key_vault_administrators : "${k}_admin" => merge(v, {
+  key_vault_administrators_assignments = { for k, v in var.key_vault_administrators : "${k}_admin" => merge(v, {
     role_definition_name = "Key Vault Administrator"
-    }) },
-    {
-      deploy_admin = {
-        principal_id                     = data.azurerm_client_config.current.object_id
-        role_definition_name             = "Key Vault Administrator"
-        skip_service_principal_aad_check = false
-        principal_type                   = null
-      }
-  })
+  }) }
 
   key_vault_encryption_users = { for k, v in var.key_vault_encryption_users : "${k}_enc_users" => merge(v, {
     role_definition_name = "Key Vault Crypto Service Encryption User"

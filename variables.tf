@@ -1,7 +1,7 @@
 variable "role_assignment_propagation_delay" {
   type        = string
   default     = "30s"
-  description = "How long to wait after granting the data-plane role assignments before creating keys. Azure role assignments are eventually consistent, so a key created immediately after the grant can fail with a 403. Set to \"0s\" to disable the wait."
+  description = "How long to wait after granting the deploying identity Key Vault Administrator before creating keys. Azure role assignments are eventually consistent, so a key created immediately after the grant can fail with a 403. Set to \"0s\" to disable the wait."
 }
 
 variable "name" {

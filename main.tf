@@ -36,16 +36,29 @@ resource "azurerm_role_assignment" "this" {
   principal_type                   = each.value.principal_type
 }
 
-# Azure role assignments are eventually consistent. A key is created over the vault's
-# DATA plane, so the caller needs Key Vault Crypto Officer to have actually propagated --
-# depends_on alone only orders the API calls, it does not wait for the grant to take
-# effect. Without this the first apply fails with a bare 403 that says nothing about
-# propagation, and a second apply succeeds.
+# The identity running Terraform gets Key Vault Administrator so it can create the keys
+# below over the vault's data plane. It is a separate resource so the propagation wait
+# can depend on this one grant only, not on every assignment in local.role_assignments.
+resource "azurerm_role_assignment" "deployer" {
+  scope                = azurerm_key_vault.this.id
+  role_definition_name = "Key Vault Administrator"
+  principal_id         = data.azurerm_client_config.current.object_id
+}
+
+moved {
+  from = azurerm_role_assignment.this["deploy_admin"]
+  to   = azurerm_role_assignment.deployer
+}
+
+# Azure role assignments are eventually consistent. depends_on only orders the API calls;
+# it does not wait for the deployer's Key Vault Administrator grant to take effect on the
+# data plane. Without a wait the first apply can fail creating a key with a bare 403 and
+# the second apply succeeds.
 resource "time_sleep" "role_propagation" {
-  count = length(local.role_assignments) > 0 && var.role_assignment_propagation_delay != "0s" ? 1 : 0
+  count = var.role_assignment_propagation_delay != "0s" ? 1 : 0
 
   create_duration = var.role_assignment_propagation_delay
-  depends_on      = [azurerm_role_assignment.this]
+  depends_on      = [azurerm_role_assignment.deployer]
 }
 
 resource "azurerm_key_vault_key" "customer_managed_key_rsa" {
@@ -73,6 +86,7 @@ resource "azurerm_key_vault_key" "customer_managed_key_rsa" {
 
   depends_on = [
     azurerm_role_assignment.this,
+    azurerm_role_assignment.deployer,
     time_sleep.role_propagation
   ]
 }
@@ -110,6 +124,7 @@ resource "azurerm_key_vault_key" "this" {
 
   depends_on = [
     azurerm_role_assignment.this,
+    azurerm_role_assignment.deployer,
     time_sleep.role_propagation
   ]
 }
