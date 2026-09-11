@@ -36,6 +36,31 @@ resource "azurerm_role_assignment" "this" {
   principal_type                   = each.value.principal_type
 }
 
+# The identity running Terraform gets Key Vault Administrator so it can create the keys
+# below over the vault's data plane. It is a separate resource so the propagation wait
+# can depend on this one grant only, not on every assignment in local.role_assignments.
+resource "azurerm_role_assignment" "deployer" {
+  scope                = azurerm_key_vault.this.id
+  role_definition_name = "Key Vault Administrator"
+  principal_id         = data.azurerm_client_config.current.object_id
+}
+
+moved {
+  from = azurerm_role_assignment.this["deploy_admin"]
+  to   = azurerm_role_assignment.deployer
+}
+
+# Azure role assignments are eventually consistent. depends_on only orders the API calls;
+# it does not wait for the deployer's Key Vault Administrator grant to take effect on the
+# data plane. Without a wait the first apply can fail creating a key with a bare 403 and
+# the second apply succeeds.
+resource "time_sleep" "role_propagation" {
+  count = var.role_assignment_propagation_delay != "0s" ? 1 : 0
+
+  create_duration = var.role_assignment_propagation_delay
+  depends_on      = [azurerm_role_assignment.deployer]
+}
+
 resource "azurerm_key_vault_key" "customer_managed_key_rsa" {
   count = var.customer_managed_key != null ? 1 : 0
 
@@ -60,7 +85,9 @@ resource "azurerm_key_vault_key" "customer_managed_key_rsa" {
   }
 
   depends_on = [
-    azurerm_role_assignment.this
+    azurerm_role_assignment.this,
+    azurerm_role_assignment.deployer,
+    time_sleep.role_propagation
   ]
 }
 
@@ -96,6 +123,8 @@ resource "azurerm_key_vault_key" "this" {
   each.value.tags)
 
   depends_on = [
-    azurerm_role_assignment.this
+    azurerm_role_assignment.this,
+    azurerm_role_assignment.deployer,
+    time_sleep.role_propagation
   ]
 }
