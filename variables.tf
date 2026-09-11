@@ -177,6 +177,28 @@ variable "key_vault_crypto_users" {
   default = {}
 }
 
+variable "key_vault_crypto_officers" {
+  description = "Map of Key Vault Crypto Officers. Required to CREATE keys in the vault -- Key Vault Crypto User only permits using existing ones."
+  type = map(object({
+    principal_id                     = string
+    skip_service_principal_aad_check = optional(bool, false)
+    principal_type                   = optional(string)
+  }))
+
+  default = {}
+}
+
+variable "key_vault_readers" {
+  description = "Map of Key Vault Readers. Read metadata of vault objects without access to their values."
+  type = map(object({
+    principal_id                     = string
+    skip_service_principal_aad_check = optional(bool, false)
+    principal_type                   = optional(string)
+  }))
+
+  default = {}
+}
+
 variable "key_vault_secret_users" {
   description = "Map of Key Vault Secret Users"
   type = map(object({
