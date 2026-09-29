@@ -14,9 +14,14 @@ keeps its name, `enable_rbac_authorization`.
    [azurerm 5.0 upgrade guide](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/5.0-upgrade-guide)
    for the renames it applies outside this module.
 2. Pin this module to `~> 2.0` and run `terraform init -upgrade`.
-3. `terraform plan`: the rename is in place and replaces no vault or key.
+3. `terraform plan`: the rename is in place and replaces no vault or key. The plan also shows the
+   deploying identity's Key Vault Administrator assignment moving from
+   `azurerm_role_assignment.this["deploy_admin"]` to `azurerm_role_assignment.deployer`; that
+   comes from the module's `moved` block and is not a replacement.
 
-Consumers who cannot move to azurerm 5 stay on `~> 1.0`, which keeps working on 4.x.
+Consumers who cannot move to azurerm 5 stay on `~> 1.0`. That only works on azurerm 4.x if the
+root pins `azurerm ~> 4.0`: v1.1.1 declares `>= 4`, so without that pin a fresh `terraform init`
+resolves azurerm 5 and `terraform validate` fails.
 
 ### Also in 2.0
 
