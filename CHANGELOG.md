@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.0.0](https://github.com/schubergphilis-ep/terraform-azure-mcaf-key-vault/compare/v1.1.1...v2.0.0) (2026-10-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* the module requires azurerm >= 5 (azurerm_key_vault.enable_rbac_authorization became rbac_authorization_enabled in v5). Move roots to azurerm ~> 5.0 and pin the module to ~> 2.0; the rename is in place and replaces no resources. Consumers that cannot move yet stay on ~> 1.0. See UPGRADING.md.
+
+### chore
+
+* mark the azurerm 5 floor as a major and add UPGRADING.md ([#20](https://github.com/schubergphilis-ep/terraform-azure-mcaf-key-vault/issues/20)) ([7d6dc77](https://github.com/schubergphilis-ep/terraform-azure-mcaf-key-vault/commit/7d6dc77e2f39391c4df1d3ef5a305200861b9441))
+
+
+### 🚀 Features
+
+* add Key Vault Crypto Officer and Reader role sets ([#18](https://github.com/schubergphilis-ep/terraform-azure-mcaf-key-vault/issues/18)) ([2f3c920](https://github.com/schubergphilis-ep/terraform-azure-mcaf-key-vault/commit/2f3c920776dde9ff948700a307187f54e38d26b8))
+
+
+### 🐛 Fixes
+
+* rename enable_rbac_authorization for azurerm v5 ([#16](https://github.com/schubergphilis-ep/terraform-azure-mcaf-key-vault/issues/16)) ([82041fc](https://github.com/schubergphilis-ep/terraform-azure-mcaf-key-vault/commit/82041fc611d415315888328d08c1e4174abafb2c))
+* wait for RBAC propagation before creating keys ([#17](https://github.com/schubergphilis-ep/terraform-azure-mcaf-key-vault/issues/17)) ([0c21e74](https://github.com/schubergphilis-ep/terraform-azure-mcaf-key-vault/commit/0c21e74d64047b4782cf4d52cce8b13d6337c1ea))
+
 ## [1.1.0](https://github.com/schubergphilis-ep/terraform-azure-mcaf-key-vault/compare/v1.1.1...v1.1.0) (2025-07-28)
 
 ## [1.1.1](https://github.com/schubergphilis-ep/terraform-azure-mcaf-key-vault/compare/v1.0.2...v1.1.1) (2025-07-28)
@@ -99,4 +121,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🚀 Features
 
 * first release ([#1](https://github.com/schubergphilis/terraform-azure-mcaf-key-vault/pull/1)) ([fb49df9](https://github.com/schubergphilis-ep/terraform-azure-mcaf-key-vault/commit/fb49df90be075e1192eed3422cd02624ebfe9ce8))
-
